@@ -28,7 +28,7 @@ exports.authorize = (...role) => {
     req.user = decoded.user;
     if (!role.includes(req.user.role)) {
       return next(res.status(403).json({
-          msg: `User role ${req.user.role} is not authorized to access this route`,
+          msg: `User role of ${req.user.role} is not authorized to perform this operation`,
         }),
       )};
     next();
