@@ -1,0 +1,133 @@
+import {useReducer} from 'react';
+import axios from 'axios';
+import AuthContext from './AuthContext';
+import AuthReducer from './AuthReducer';
+import setAuthToken from '../../utils/SetAuthToken';
+import jwtDecode from 'jwt-decode';
+import {
+    USER_LOADED, 
+    LOGIN_SUCCESS, 
+    REGISTER_SUCCESS, 
+    LOGIN_FAIL, 
+    REGISTER_FAIL, 
+    AUTH_ERROR,
+    LOGOUT
+} from '../types';
+import toastr from 'toastr';
+import 'toastr/build/toastr.min.css';
+
+const AuthState = props => {
+    const INITIALSTATE = {
+        token: localStorage.getItem('token'),
+        isAuthenticated: null,
+        user: null,
+        users: [],
+        error: null,
+        loading: false,
+    }
+
+    const [state, dispatch] = useReducer(AuthReducer, INITIALSTATE);
+
+
+    // Load User
+  const loadUser = async () => {
+    let token;
+    if (localStorage.token) {
+      setAuthToken(localStorage.token);
+      token = localStorage.token;
+    }
+
+
+    const {user} = jwtDecode(token);
+
+    try {
+      const res = await axios.get(`/user/${user.id}`);
+
+      dispatch({
+        type: USER_LOADED,
+        payload: res.data
+      });
+    } catch (err) {
+      dispatch({ type: AUTH_ERROR });
+    }
+}
+
+  // Login User
+  const login = async formData => {
+    const config = {
+      headers: {
+        'Content-type': 'application/json'
+      }
+    };
+
+    try {
+      const res = await axios.post('/user/login', formData, config);
+
+      dispatch({
+        type: LOGIN_SUCCESS,
+        payload: res.data
+      });
+      toastr.success(res.data.message);
+      loadUser();
+    } catch (err) {
+      toastr.error(err.response.data.message);
+      dispatch({
+        type: LOGIN_FAIL,
+        payload: err.response.data.message
+      });
+    }
+  };
+
+   // Register User
+   const register = async formData => {
+    const config = {
+      headers: {
+        'Content-type': 'application/json'
+      }
+    };
+
+    try {
+      const res = await axios.post('/api/user', formData, config);
+
+      dispatch({
+        type: REGISTER_SUCCESS,
+        payload: res.data
+      });
+
+      loadUser();
+    } catch (err) {
+      dispatch({
+        type: REGISTER_FAIL,
+        payload: err.response.data.msg
+      });
+    }
+  };
+
+  // Logout
+  const logout = () => {
+    dispatch({ type: LOGOUT })
+  }
+
+
+    return (
+        <AuthContext.Provider
+            value={{
+                token: state.token,
+                isAuthenticated: state.isAuthenticated,
+                loading: state.loading,
+                user: state.user,
+                users: state.users,
+                error: state.error,
+                login,
+                register,
+                loadUser,
+                logout
+            }}
+        >
+            {props.children}
+        </AuthContext.Provider>
+    );
+};
+
+export default AuthState
+
