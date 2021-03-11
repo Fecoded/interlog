@@ -3,13 +3,15 @@ const pool = require("../config/db");
 module.exports = {
     create: (data, cb) => {
         pool.query(
-            `INSERT into transactions(Customer_Name,Product_Name,Reporting_Date,Field_Staff_Name,Opening_balance,Take_on,Release_,Loading,Release_balance,Closing_balance,Physical_Stock_Balance)
-                    values(?,?,?,?,?,?,?,?,?,?,?)`,
+            `INSERT into transactions(UserId,Customer_Name,Product_Name,Reporting_Date,Field_Staff_Name,State,Opening_balance,Take_on,Release_,Loading,Release_balance,Closing_balance,Physical_Stock_Balance)
+                    values(?,?,?,?,?,?,?,?,?,?,?,?,?)`,
             [
+                data.UserId,
                 data.Customer_Name,
                 data.Product_Name,
                 data.Reporting_Date,
                 data.Field_Staff_Name,
+                data.State,
                 data.Opening_balance,
                 data.Take_on,
                 data.Release_,
@@ -37,27 +39,29 @@ module.exports = {
             }
         );
     },
-    getTransactionById: (id, cb) => {
+    getTransactionById: (userId, cb) => {
         pool.query(
-            `SELECT * from transactions where id = ?`,
-            [id],
+            `SELECT * from transactions where UserId = ?`,
+            [userId],
             (error, result) => {
                 if(error) {
                     return cb(error);
                 }
-                return cb(null, result[0]);
+                return cb(null, result);
             }
         )
     },
 
     updateTransaction: (data, cb) => {
         pool.query(
-            `UPDATE transactions SET Customer_Name = ?,Product_Name = ?,Reporting_Date = ?,Field_Staff_Name = ?,Opening_balance = ?,Take_on = ?,Release_ = ?,Loading = ?,Release_balance = ?,Closing_balance = ?,Physical_Stock_Balance = ?  WHERE id = ?`,
+            `UPDATE transactions SET UserId = ?, Customer_Name = ?,Product_Name = ?,Reporting_Date = ?,Field_Staff_Name = ?,State = ?,Opening_balance = ?,Take_on = ?,Release_ = ?,Loading = ?,Release_balance = ?,Closing_balance = ?,Physical_Stock_Balance = ?  WHERE id = ?`,
             [
+                data.UserId,
                 data.Customer_Name,
                 data.Product_Name,
                 data.Reporting_Date,
                 data.Field_Staff_Name,
+                data.State,
                 data.Opening_balance,
                 data.Take_on,
                 data.Release_,

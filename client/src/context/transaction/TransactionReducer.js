@@ -1,4 +1,4 @@
-import {GET_TRANSACTIONS, CREATE_TRANSACTION, TRANSACTION_ERROR} from '../types';
+import {GET_TRANSACTIONS, USER_TRANSACTIONS, CREATE_TRANSACTION, TRANSACTION_ERROR} from '../types';
 
 
 const TransactionReducer = (state, action) => {
@@ -8,6 +8,12 @@ const TransactionReducer = (state, action) => {
             return {
                 ...state,
                 transactions: payload,
+                loading: false
+            }
+        case USER_TRANSACTIONS:
+            return {
+                ...state,
+                userTransactions: payload,
                 loading: false
             }
         case CREATE_TRANSACTION:

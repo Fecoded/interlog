@@ -1,16 +1,18 @@
 import {useReducer} from 'react';
-import {GET_TRANSACTIONS, CREATE_TRANSACTION, TRANSACTION_ERROR} from '../types';
+import {GET_TRANSACTIONS, USER_TRANSACTIONS, CREATE_TRANSACTION, TRANSACTION_ERROR} from '../types';
 import axios from 'axios';
 import TransactionContext from './TransactionContext';
 import TransactionReducer from './TransactionReducer';
 import setAuthToken from '../../utils/SetAuthToken';
 import toastr from 'toastr';
 import 'toastr/build/toastr.min.css';
+import jwtDecode from 'jwt-decode';
 
 const TransactionState = props => {
     const INITIALSTATE = {
         transaction: null,
         transactions: [],
+        userTransactions: [],
         error: null,
         loading: false
     }
@@ -37,6 +39,32 @@ const TransactionState = props => {
     }
   };
 
+   // Get User Transactions
+   const getUserTransactions = async () => {
+    let token;
+
+    if (localStorage.token) {
+      setAuthToken(localStorage.token);
+      token = localStorage.token;
+    }
+
+    const {user} = jwtDecode(token);
+
+    try {
+      const res = await axios.get(`/transaction/${user.id}`);
+
+      dispatch({
+        type: USER_TRANSACTIONS,
+        payload: res.data.data
+      });
+  
+      
+    } catch (err) {
+      dispatch({ type: TRANSACTION_ERROR, payload: err.response.message });
+    }
+  };
+
+
   // Create Transaction
   const createTransaction = async (formData) => {
     if (localStorage.token) {
@@ -60,14 +88,11 @@ const TransactionState = props => {
       toastr.success(res.data.msg);
       formData.setReporting_date('');
       formData.setField_Staff_Name('');
-      formData.setClosing_balance('');
       formData.setCustomer_Name('');
       formData.setLoading('');
       formData.setOpening_balance('');
-      formData.setPhysical_Stock_Balance('');
       formData.setProduct_Name('');
       formData.setRelease_('');
-      formData.setRelease_balance('');
       formData.setTake_on('');
       
     } catch (err) {
@@ -81,9 +106,11 @@ const TransactionState = props => {
             value={{
                 transaction: state.transaction,
                 transactions: state.transactions,
+                userTransactions: state.userTransactions,
                 error: state.error,
                 getTransactions,
-                createTransaction
+                createTransaction,
+                getUserTransactions
             }}
         >
             {props.children}

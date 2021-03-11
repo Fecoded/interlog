@@ -6,8 +6,9 @@ import setAuthToken from '../../utils/SetAuthToken';
 import jwtDecode from 'jwt-decode';
 import {
     USER_LOADED, 
+    USERS_LOADED, 
     LOGIN_SUCCESS, 
-    REGISTER_SUCCESS, 
+    // REGISTER_SUCCESS, 
     LOGIN_FAIL, 
     REGISTER_FAIL, 
     AUTH_ERROR,
@@ -52,6 +53,25 @@ const AuthState = props => {
     }
 }
 
+  // Load Users
+  const loadUsers = async () => {
+    if (localStorage.token) {
+      setAuthToken(localStorage.token);
+    }
+
+    try {
+      const res = await axios.get(`/user`);
+
+      dispatch({
+        type: USERS_LOADED,
+        payload: res.data.data
+      });
+    } catch (err) {
+      dispatch({ type: AUTH_ERROR });
+    }
+}
+
+
   // Login User
   const login = async formData => {
     const config = {
@@ -87,14 +107,14 @@ const AuthState = props => {
     };
 
     try {
-      const res = await axios.post('/api/user', formData, config);
+      const res = await axios.post('/user', formData, config);
 
-      dispatch({
-        type: REGISTER_SUCCESS,
-        payload: res.data
-      });
+      formData.setFullname("");
+      formData.setEmail("");
+      formData.hideModal(window.$("#addUserModal").modal("hide"));
+      toastr.success(res.data.msg);
 
-      loadUser();
+      loadUsers();
     } catch (err) {
       dispatch({
         type: REGISTER_FAIL,
@@ -121,6 +141,7 @@ const AuthState = props => {
                 login,
                 register,
                 loadUser,
+                loadUsers,
                 logout
             }}
         >

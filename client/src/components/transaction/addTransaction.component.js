@@ -18,19 +18,22 @@ const AddTransaction = () => {
   const { createTransaction } = transactionContext;
   const { getCustomers, customers } = customerContext;
   const { getProducts, products } = productContext;
-  const { loadUser } = authContext;
+  const { loadUser, user} = authContext;
 
   const [Reporting_Date, setReporting_date] = useState("");
   const [Field_Staff_Name, setField_Staff_Name] = useState("");
-  const [Closing_balance, setClosing_balance] = useState(0);
   const [Customer_Name, setCustomer_Name] = useState("");
   const [Loading, setLoading] = useState(0);
   const [Opening_balance, setOpening_balance] = useState(0);
-  const [Physical_Stock_Balance, setPhysical_Stock_Balance] = useState(0);
   const [Product_Name, setProduct_Name] = useState("");
   const [Release_, setRelease_] = useState(0);
-  const [Release_balance, setRelease_balance] = useState(0);
+  let Release_balance = Release_ - Loading;
+  const [setRelease_balance] = useState(Release_balance);
   const [Take_on, setTake_on] = useState(0);
+  let Closing_balance = Number.parseInt(Opening_balance) + Number.parseInt(Take_on) - Release_;
+  const [setClosing_balance] = useState(Closing_balance);
+  let Physical_Stock_Balance = Number.parseInt(Opening_balance) + Number.parseInt(Take_on) - Loading;
+  const [setPhysical_Stock_Balance] = useState(Physical_Stock_Balance);
 
 
   useEffect(() => {
@@ -44,8 +47,10 @@ const AddTransaction = () => {
   const onSubmit = (e) => {
       e.preventDefault();
       createTransaction({
+          UserId: user && user.data.id,
           Reporting_Date,
           Field_Staff_Name,
+          State: user && user.data.state,
           Closing_balance,
           Customer_Name,
           Loading,
@@ -57,14 +62,11 @@ const AddTransaction = () => {
           Take_on,
           setReporting_date,
           setField_Staff_Name,
-          setClosing_balance,
           setCustomer_Name,
           setLoading,
           setOpening_balance,
-          setPhysical_Stock_Balance,
           setProduct_Name,
           setRelease_,
-          setRelease_balance,
           setTake_on
       })
   }
@@ -145,6 +147,7 @@ const AddTransaction = () => {
                                             required
                                             />
                                     </div>
+                                  
                                     <div className="form-group">
                                             <label className="input-label">Field Staff Name</label>
                                             <input 
@@ -228,7 +231,7 @@ const AddTransaction = () => {
                                                 name="Closing_balance" 
                                                 placeholder="eg. 160" aria-label="3000" 
                                                 required data-msg="Please enter your name."
-                                                value={Number.parseInt(Opening_balance) + Number.parseInt(Take_on) - Release_}
+                                                value={Closing_balance}
                                                 onChange={(e) => setClosing_balance(e.target.value)}
                                                 disabled
                                                 />
@@ -244,7 +247,7 @@ const AddTransaction = () => {
                                                 placeholder="eg. 150" 
                                                 aria-label="3000" 
                                                 required data-msg="Please enter your name."
-                                                value={Release_ - Loading}
+                                                value={Release_balance}
                                                 onChange={(e) => setRelease_balance(e.target.value)}
                                                 disabled
                                                 />
@@ -260,7 +263,7 @@ const AddTransaction = () => {
                                                 name="Physical_Stock_Balance" placeholder="eg. 150" 
                                                 aria-label="3000" 
                                                 required data-msg="Please enter your name."
-                                                value={Number.parseInt(Opening_balance) + Number.parseInt(Take_on) - Loading}
+                                                value={Physical_Stock_Balance}
                                                 onChange={(e) => setPhysical_Stock_Balance(e.target.value)}
                                                 disabled
                                                 />
@@ -279,6 +282,7 @@ const AddTransaction = () => {
                     </div>
                 </div>
             </div>
+
             <AddCustomerModal />
             <AddProductModal />
        </Fragment>

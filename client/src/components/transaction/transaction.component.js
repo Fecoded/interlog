@@ -8,13 +8,15 @@ const Transaction = () => {
   const authContext = useContext(AuthContext);
   const transactionContext = useContext(TransactionContext);
 
-  const { getTransactions, transactions } = transactionContext;
+  const { getTransactions, transactions, getUserTransactions, userTransactions } = transactionContext;
   const { loadUser, logout, user } = authContext;
 
-  useEffect(() => {
-    getTransactions();
-    loadUser();
+  let role = user && user.data.role;
 
+  useEffect(() => {
+    loadUser();
+    getUserTransactions();
+    getTransactions();
   //eslint-disable-next-line
   }, [])
 
@@ -26,8 +28,12 @@ const Transaction = () => {
         <div className="page-header">
           <div className="row align-items-center mb-3">
             <div className="col-sm mb-2 mb-sm-0">
-              <h1 className="page-header-title">Transactions <span className="badge badge-soft-dark ml-2">{transactions.length}</span></h1>
-
+              {role === "admin" || role === "manager" || role === "hr" ?
+               <h1 className="page-header-title">Transactions <span className="badge badge-soft-dark ml-2">{transactions.length}</span></h1> 
+               :
+               <h1 className="page-header-title">Transactions <span className="badge badge-soft-dark ml-2">{userTransactions.length}</span></h1>
+              }
+            
               <div className="mt-2">
                 <a className="text-body mr-3" href="#!" >
                   <i className="tio-download-to mr-1"></i> Export
@@ -37,10 +43,13 @@ const Transaction = () => {
             </div>
             
             <div className="col-sm-auto">
-              {user && user.data.role === "staff" && 
-                <Link className="btn btn-primary" to="/create">Add Transaction</Link>
+              {role === "admin" && 
+                <Fragment>
+                  <Link className="btn btn-primary" to="/create">Add Transaction</Link>
+                  <Link className="btn btn-primary ml-3" to="/users">Get Users</Link>
+                </Fragment>
               }
-              {user && user.data.role === "admin" && 
+              {role === "staff" && 
                 <Link className="btn btn-primary" to="/create">Add Transaction</Link>
               }
               <span className="btn btn-primary ml-3" onClick={() => logout()}>Logout</span>
@@ -150,6 +159,7 @@ const Transaction = () => {
                   <th>Product</th>
                   <th>Date</th>
                   <th>Staff</th>
+                  <th>State</th>
                   <th>Opening</th>
                   <th>Take On</th>
                   <th>Release</th>
@@ -162,51 +172,104 @@ const Transaction = () => {
                   <th>Actions</th>
                 </tr>
               </thead>
-
-              <tbody>
-                {transactions.length > 0 && 
-                  transactions.map(x => (
-                    <tr key={x.id}>
-                    <td className="table-column-pr-0">
-                    </td>
-                    <td>{x.Product_Name}</td>
-                    <td>{x.Reporting_Date}</td>
-                    <td>{x.Field_Staff_Name}</td>
-                    <td>{x.Opening_balance}</td>
-                    <td>{x.Take_on}</td>
-                    <td>{x.Release_}</td>
-                    <td>{x.Loading}</td>
-                    <td>{x.Closing_balance}</td>
-                    <td>{x.Release_balance}</td>
-                    <td>{x.Physical_Stock_Balance}</td>
-                    <td>{x.Approval_1}</td>
-                    <td>{x.Approval_2}</td>
-                    <td>
-                        <div className="btn-group">
-                          <a className="btn btn-sm btn-white" href="/">
-                              <i className="tio-edit"></i> Edit
-                          </a>
-                        </div>
-                        <div className="btn-group ml-3">
-                          <a className="btn btn-sm btn-white" href="/">
-                              <i className="tio-delete"></i> Delete
-                          </a>
-                        </div>
-                        {user && user.data.role !== "staff" && 
-                          <div className="btn-group ml-3">
+              {role === "admin" || role === "manager" || role === "hr" ?
+                <tbody>
+                  {transactions.length > 0 ? 
+                    transactions.map((x) => (
+                      <tr key={x.id}>
+                      <td className="table-column-pr-0">
+                      </td>
+                      <td>{x.Product_Name}</td>
+                      <td>{x.Reporting_Date}</td>
+                      <td>{x.Field_Staff_Name}</td>
+                      <td>{x.State}</td>
+                      <td>{x.Opening_balance}</td>
+                      <td>{x.Take_on}</td>
+                      <td>{x.Release_}</td>
+                      <td>{x.Loading}</td>
+                      <td>{x.Closing_balance}</td>
+                      <td>{x.Release_balance}</td>
+                      <td>{x.Physical_Stock_Balance}</td>
+                      <td>{x.Approval_1}</td>
+                      <td>{x.Approval_2}</td>
+                      <td>
+                          <div className="btn-group">
                             <a className="btn btn-sm btn-white" href="/">
-                                <i className="tio-publish"></i> Approved
+                                <i className="tio-edit"></i> Edit
                             </a>
                           </div>
-                        }
-                    </td>
-                
+                          <div className="btn-group ml-3">
+                            <a className="btn btn-sm btn-white" href="/">
+                                <i className="tio-delete"></i> Delete
+                            </a>
+                          </div>
+                          {role !== "staff" && 
+                            <div className="btn-group ml-3">
+                              <a className="btn btn-sm btn-white" href="/">
+                                  <i className="tio-publish"></i> Approved
+                              </a>
+                            </div>
+                          }
+                      </td>
+                  
+                    </tr>
+                    )): (
+                      <tr>
+                        <td colSpan="14" className="text-center">No transaction available</td>
+                      </tr>
+                    )
+                  }
+            </tbody>
+              :
+              <tbody>
+              {userTransactions.length > 0 ? 
+                userTransactions.map((x) => (
+                  <tr key={x.id}>
+                  <td className="table-column-pr-0">
+                  </td>
+                  <td>{x.Product_Name}</td>
+                  <td>{x.Reporting_Date}</td>
+                  <td>{x.Field_Staff_Name}</td>
+                  <td>{x.State}</td>
+                  <td>{x.Opening_balance}</td>
+                  <td>{x.Take_on}</td>
+                  <td>{x.Release_}</td>
+                  <td>{x.Loading}</td>
+                  <td>{x.Closing_balance}</td>
+                  <td>{x.Release_balance}</td>
+                  <td>{x.Physical_Stock_Balance}</td>
+                  <td>{x.Approval_1}</td>
+                  <td>{x.Approval_2}</td>
+                  <td>
+                      <div className="btn-group">
+                        <a className="btn btn-sm btn-white" href="/">
+                            <i className="tio-edit"></i> Edit
+                        </a>
+                      </div>
+                      <div className="btn-group ml-3">
+                        <a className="btn btn-sm btn-white" href="/">
+                            <i className="tio-delete"></i> Delete
+                        </a>
+                      </div>
+                      {role !== "staff" && 
+                        <div className="btn-group ml-3">
+                          <a className="btn btn-sm btn-white" href="/">
+                              <i className="tio-publish"></i> Approved
+                          </a>
+                        </div>
+                      }
+                  </td>
+              
+                </tr>
+                )): (
+                  <tr>
+                    <td colSpan="14" className="text-center">No transaction available</td>
                   </tr>
-                  ))
-                }
-               
+                )
+              }
+            </tbody>
 
-              </tbody>
+              }
             </table>
           </div>
    

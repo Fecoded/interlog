@@ -1,7 +1,8 @@
 import {
     USER_LOADED, 
+    USERS_LOADED, 
     LOGIN_SUCCESS, 
-    REGISTER_SUCCESS, 
+    // REGISTER_SUCCESS, 
     LOGIN_FAIL, 
     REGISTER_FAIL, 
     AUTH_ERROR,
@@ -18,7 +19,13 @@ const AuthReducer = (state, action) => {
           loading: false,
           user: payload
         };
-      case REGISTER_SUCCESS:
+      case USERS_LOADED:
+        return {
+          ...state,
+          isAuthenticated: true,
+          loading: false,
+          users: payload
+        };
       case LOGIN_SUCCESS:
         localStorage.setItem('token', payload.token);
         return {

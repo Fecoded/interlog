@@ -3,10 +3,11 @@ const pool = require("../config/db");
 module.exports = {
     create: (data, cb) => {
         pool.query(
-            `INSERT into users(fullname, email, password, role)
-                    values(?,?,?,?)`,
+            `INSERT into users(fullname, state, email, password, role)
+                    values(?,?,?,?,?)`,
             [
                 data.fullname,
+                data.state,
                 data.email,
                 data.password,
                 data.role
@@ -21,7 +22,7 @@ module.exports = {
     },
     getUsers: cb => {
         pool.query(
-            `SELECT id,fullname,email,role from users`,
+            `SELECT * from users`,
             [], (error, results) => {
                 if(error) {
                     return cb(error);
@@ -32,7 +33,7 @@ module.exports = {
     },
     getUserById: (id, cb) => {
         pool.query(
-            `SELECT id,fullname,email,role from users where id = ?`,
+            `SELECT id,fullname,state,email,role from users where id = ?`,
             [id],
             (error, result) => {
                 if(error) {
@@ -57,7 +58,7 @@ module.exports = {
 
     updateUser: (data, cb) => {
         pool.query(
-            `UPDATE users SET fullname = ?, email = ?, password = ?, role = ? WHERE id = ?`,
+            `UPDATE users SET fullname = ?, state = ?, email = ?, password = ?, role = ? WHERE id = ?`,
             [
                 data.fullname,
                 data.email,
