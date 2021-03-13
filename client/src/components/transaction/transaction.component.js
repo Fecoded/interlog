@@ -1,25 +1,59 @@
-import { Fragment, useContext, useEffect } from 'react'
+import { Fragment, useContext, useEffect, useState } from 'react'
 import {Link} from 'react-router-dom'
 
+import EditTransactionModal from './editTransactionModal.component'
+
 import TransactionContext from '../../context/transaction/TransactionContext';
-import AuthContext from '../../context/auth/AuthContext' 
+import AuthContext from '../../context/auth/AuthContext';
+import CustomerContext from '../../context/customer/CustomerContext';
+import ProductContext from '../../context/product/ProductContext'; 
 
 const Transaction = () => {
   const authContext = useContext(AuthContext);
   const transactionContext = useContext(TransactionContext);
+  const customerContext = useContext(CustomerContext);
+  const productContext = useContext(ProductContext);
 
-  const { getTransactions, transactions, getUserTransactions, userTransactions } = transactionContext;
+  const { 
+    getTransactions, 
+    transactions, 
+    getUserTransactions, 
+    userTransactions, 
+    deleteTransaction,
+    updateApproval
+  } = transactionContext;
   const { loadUser, logout, user } = authContext;
+  const { getCustomers } = customerContext;
+  const { getProducts } = productContext;
 
+  const [current, setCurrent] = useState(null);
   let role = user && user.data.role;
 
+  const onConfirm = (id) => {
+    if(window.confirm("Do you want to delete?")) deleteTransaction(id);
+  }
+
+  const onConfirmApproval = (x) => {
+    if(window.confirm("Do you want to approve?")){
+      if(role === "hr"){
+        x.Approval_1 = user && user.data.fullname;
+        updateApproval(x);
+      }else {
+        x.Approval_2 = user && user.data.fullname;
+        updateApproval(x);
+      }
+    }
+  }
+  
   useEffect(() => {
     loadUser();
     getUserTransactions();
     getTransactions();
-  //eslint-disable-next-line
+    getCustomers();
+    getProducts();
+    //eslint-disable-next-line
   }, [])
-
+  
     return(
         <Fragment>
 
@@ -45,7 +79,6 @@ const Transaction = () => {
             <div className="col-sm-auto">
               {role === "admin" && 
                 <Fragment>
-                  <Link className="btn btn-primary" to="/create">Add Transaction</Link>
                   <Link className="btn btn-primary ml-3" to="/users">Get Users</Link>
                 </Fragment>
               }
@@ -194,22 +227,29 @@ const Transaction = () => {
                       <td>{x.Approval_2}</td>
                       <td>
                           <div className="btn-group">
-                            <a className="btn btn-sm btn-white" href="/">
+                            <span className="btn btn-sm btn-white" onClick={() => setCurrent(x)} data-toggle="modal" data-target="#edittransactionModal">
                                 <i className="tio-edit"></i> Edit
-                            </a>
+                            </span>
                           </div>
                           <div className="btn-group ml-3">
-                            <a className="btn btn-sm btn-white" href="/">
+                            <span className="btn btn-sm btn-white" onClick={() => onConfirm(x.id)}>
                                 <i className="tio-delete"></i> Delete
-                            </a>
+                            </span>
                           </div>
-                          {role !== "staff" && 
+                          {x.Approval_1 !== "" && x.Approval_2 !== "" ? 
                             <div className="btn-group ml-3">
-                              <a className="btn btn-sm btn-white" href="/">
-                                  <i className="tio-publish"></i> Approved
-                              </a>
+                              <span className="btn btn-sm btn-white">
+                                  <i className="tio-done"></i> Approved
+                              </span>
                             </div>
-                          }
+                          :
+                          <div className="btn-group ml-3">
+                            <span className="btn btn-sm btn-white" onClick={() => onConfirmApproval(x)}>
+                                <i className="tio-clear"></i> Approve
+                            </span>
+                           </div>
+                        }
+                        
                       </td>
                   
                     </tr>
@@ -242,22 +282,16 @@ const Transaction = () => {
                   <td>{x.Approval_2}</td>
                   <td>
                       <div className="btn-group">
-                        <a className="btn btn-sm btn-white" href="/">
+                        <span className="btn btn-sm btn-white" onClick={() => setCurrent(x)} data-toggle="modal" data-target="#edittransactionModal">
                             <i className="tio-edit"></i> Edit
-                        </a>
+                        </span>
                       </div>
                       <div className="btn-group ml-3">
-                        <a className="btn btn-sm btn-white" href="/">
+                        <span className="btn btn-sm btn-white" onClick={() => onConfirm(x.id)}>
                             <i className="tio-delete"></i> Delete
-                        </a>
+                        </span>
                       </div>
-                      {role !== "staff" && 
-                        <div className="btn-group ml-3">
-                          <a className="btn btn-sm btn-white" href="/">
-                              <i className="tio-publish"></i> Approved
-                          </a>
-                        </div>
-                      }
+                  
                   </td>
               
                 </tr>
@@ -276,6 +310,7 @@ const Transaction = () => {
         </div>
     
       </div>
+      <EditTransactionModal current={current} user={user}/>
         </Fragment>
     )
 }

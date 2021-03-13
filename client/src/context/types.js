@@ -1,5 +1,6 @@
 // COMMON
 export const START_SPINNER = "START_SPINNER";
+export const SET_CURRENT = "SET_CURRENT";
 
 // AUTH
 export const LOGIN_SUCCESS = "LOGIN_SUCCESS";

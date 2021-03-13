@@ -10,7 +10,7 @@ const User = () => {
   const authContext = useContext(AuthContext);
   const transactionContext = useContext(TransactionContext);
 
-//   const {} = transactionContext;
+  const {} = transactionContext;
   const { loadUser, loadUsers, users } = authContext;
 
   useEffect(() => {

@@ -1,5 +1,5 @@
 import {useReducer} from 'react';
-import {GET_TRANSACTIONS, USER_TRANSACTIONS, CREATE_TRANSACTION, TRANSACTION_ERROR} from '../types';
+import {GET_TRANSACTIONS, USER_TRANSACTIONS, CREATE_TRANSACTION, UPDATE_TRANSACTION, SET_CURRENT, TRANSACTION_ERROR} from '../types';
 import axios from 'axios';
 import TransactionContext from './TransactionContext';
 import TransactionReducer from './TransactionReducer';
@@ -13,8 +13,9 @@ const TransactionState = props => {
         transaction: null,
         transactions: [],
         userTransactions: [],
-        error: null,
-        loading: false
+        current: null,
+        loading: false,
+        error: null
     }
 
     const [state, dispatch] = useReducer(TransactionReducer, INITIALSTATE);
@@ -96,8 +97,98 @@ const TransactionState = props => {
       formData.setTake_on('');
       
     } catch (err) {
-      dispatch({ type: TRANSACTION_ERROR, payload: err.response.message });
+      dispatch({ type: TRANSACTION_ERROR, payload: err.response.msg });
     }
+  }
+
+    // Update Transaction
+    const updateTransaction = async (formData) => {
+      if (localStorage.token) {
+        setAuthToken(localStorage.token);
+      }
+  
+      const config = {
+        headers : {
+          "Content-Type": "application/json"
+        }
+      };
+  
+      try {
+        const res = await axios.patch('/transaction', formData, config);
+  
+        dispatch({
+          type: UPDATE_TRANSACTION,
+          // payload: res.data.data
+        })
+  
+        toastr.success(res.data.msg);
+        formData.setReporting_date('');
+        formData.setField_Staff_Name('');
+        formData.setCustomer_Name('');
+        formData.setLoading('');
+        formData.setOpening_balance('');
+        formData.setProduct_Name('');
+        formData.setRelease_('');
+        formData.setTake_on('');
+        formData.hideModal(window.$("#edittransactionModal").modal("hide"));
+        getTransactions();
+        getUserTransactions();
+        
+      } catch (err) {
+        dispatch({ type: TRANSACTION_ERROR, payload: err.response.msg });
+      }
+    }
+
+    // Update Approval
+    const updateApproval = async (formData) => {
+      if (localStorage.token) {
+        setAuthToken(localStorage.token);
+      }
+  
+      const config = {
+        headers : {
+          "Content-Type": "application/json"
+        }
+      };
+  
+      try {
+        const res = await axios.patch('/transaction', formData, config);
+  
+        dispatch({
+          type: UPDATE_TRANSACTION,
+          // payload: res.data.data
+        })
+  
+        toastr.success(res.data.msg);
+       
+        getTransactions();
+        
+      } catch (err) {
+        dispatch({ type: TRANSACTION_ERROR, payload: err.response.msg });
+      }
+    }
+
+    // Remove Transaction
+    const deleteTransaction = async (id) => {
+      if (localStorage.token) {
+        setAuthToken(localStorage.token);
+      };
+
+      try {
+        const res = await axios.delete('/transaction', {params: {id}});
+
+        toastr.success(res.data.msg);
+        getTransactions();
+        getUserTransactions();
+        
+      } catch (err) {
+        console.log(err)
+        // dispatch({ type: TRANSACTION_ERROR, payload: err.response.msg });
+      }
+    }
+
+  const setCurrent = (data) => {
+    dispatch({ type: SET_CURRENT, payload: data });
   }
 
 
@@ -107,10 +198,15 @@ const TransactionState = props => {
                 transaction: state.transaction,
                 transactions: state.transactions,
                 userTransactions: state.userTransactions,
+                current: state.current,
                 error: state.error,
                 getTransactions,
                 createTransaction,
-                getUserTransactions
+                updateTransaction,
+                updateApproval,
+                deleteTransaction,
+                getUserTransactions,
+                setCurrent
             }}
         >
             {props.children}

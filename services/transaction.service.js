@@ -53,8 +53,9 @@ module.exports = {
     },
 
     updateTransaction: (data, cb) => {
+        console.log(data);
         pool.query(
-            `UPDATE transactions SET UserId = ?, Customer_Name = ?,Product_Name = ?,Reporting_Date = ?,Field_Staff_Name = ?,State = ?,Opening_balance = ?,Take_on = ?,Release_ = ?,Loading = ?,Release_balance = ?,Closing_balance = ?,Physical_Stock_Balance = ?  WHERE id = ?`,
+            `UPDATE transactions SET UserId = ?, Customer_Name = ?,Product_Name = ?,Reporting_Date = ?,Field_Staff_Name = ?,State = ?,Opening_balance = ?,Take_on = ?,Release_ = ?,Loading = ?,Release_balance = ?,Closing_balance = ?,Physical_Stock_Balance = ?, Approval_1 = ?, Approval_2 = ?  WHERE id = ?`,
             [
                 data.UserId,
                 data.Customer_Name,
@@ -69,6 +70,8 @@ module.exports = {
                 data.Release_balance,
                 data.Closing_balance,
                 data.Physical_Stock_Balance,
+                data.Approval_1,
+                data.Approval_2,
                 data.id
             ],
             (error, results, fields) => {

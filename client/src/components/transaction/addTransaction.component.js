@@ -7,7 +7,7 @@ import AddProductModal from './addProductModal.component'
 import TransactionContext from '../../context/transaction/TransactionContext';
 import CustomerContext from '../../context/customer/CustomerContext';
 import ProductContext from '../../context/product/ProductContext';
-import AuthContext from '../../context/auth/AuthContext' 
+import AuthContext from '../../context/auth/AuthContext'; 
 
 const AddTransaction = () => {
   const authContext = useContext(AuthContext);
