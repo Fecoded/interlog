@@ -2,7 +2,7 @@ import {
     USER_LOADED, 
     USERS_LOADED, 
     LOGIN_SUCCESS, 
-    // REGISTER_SUCCESS, 
+    FILTERED_USERS, 
     LOGIN_FAIL, 
     REGISTER_FAIL, 
     AUTH_ERROR,
@@ -34,6 +34,16 @@ const AuthReducer = (state, action) => {
           isAuthenticated: true,
           loading: false
         };
+      case FILTERED_USERS:
+        return {
+          ...state,
+          filtered: state.users.filter((user) => {
+            const regex = new RegExp(`${payload}`, 'gi');
+            return (
+                user.fullname.match(regex) ||
+                user.state.match(regex));
+        })
+        }
       case REGISTER_FAIL:
       case LOGIN_FAIL:
       case AUTH_ERROR:

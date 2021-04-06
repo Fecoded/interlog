@@ -1,23 +1,30 @@
-import { Fragment, useContext, useEffect } from 'react'
+import { Fragment, useContext, useEffect, useState } from 'react'
 import {Link} from 'react-router-dom'
 
-import TransactionContext from '../../context/transaction/TransactionContext';
+// import TransactionContext from '../../context/transaction/TransactionContext';
 import AuthContext from '../../context/auth/AuthContext' 
 
 import AddUserModal from './addUserModal.component'
 
 const User = () => {
   const authContext = useContext(AuthContext);
-  const transactionContext = useContext(TransactionContext);
+//   const transactionContext = useContext(TransactionContext);
 
-  const {} = transactionContext;
-  const { loadUser, loadUsers, users } = authContext;
+//   const {} = transactionContext;
+  const { loadUser, loadUsers, users, filteruser, filtered, deleteUser } = authContext;
+
+  const [user, setEdit] = useState("");
 
   useEffect(() => {
     loadUser();
     loadUsers();
   //eslint-disable-next-line
   }, [])
+
+  const onConfirm = (id) => {
+    if(window.confirm("Do you want to delete?")) deleteUser(id);
+  }
+
 
     return(
      <Fragment>
@@ -37,7 +44,7 @@ const User = () => {
                 </div>
                 
                 <div className="col-sm-auto">   
-                    <span className="btn btn-primary" data-toggle="modal" data-target="#addUserModal">Add User</span>
+                    <span className="btn btn-primary" onClick={() => setEdit("")} data-toggle="modal" data-target="#addUserModal">Add User</span>
                 <Link className="btn btn-primary ml-3" to="/">Transactions</Link>
                 </div>
             </div>
@@ -57,7 +64,14 @@ const User = () => {
                                 <i className="tio-search"></i>
                             </div>
                             </div>
-                            <input id="datatableSearch" type="search" className="form-control" placeholder="Search users" aria-label="Search orders"/>
+                            <input 
+                                id="datatableSearch" 
+                                type="search" 
+                                className="form-control" 
+                                placeholder="Search users" 
+                                aria-label="Search orders"
+                                onChange={(e) => filteruser(e.target.value)}
+                                />
                         </div>
                     
                         </form>
@@ -151,29 +165,54 @@ const User = () => {
                     </thead>
 
                     <tbody>
-                        {users.length > 0 ? 
-                        users.map((x) => (
-                            <tr key={x.id}>
-                            <td className="table-column-pr-0">
-                            </td>
-                            <td>{x.fullname}</td>
-                            <td>{x.state}</td>
-                            <td>{x.email}</td>
-                            <td>{x.role}</td>
-                            <td>
-                                <div className="btn-group">
-                                <span className="btn btn-sm btn-white" data-toggle="modal" data-target="#addUserModal">
-                                    <i className="tio-edit"></i> Edit
-                                </span>
-                                </div>
-                                <div className="btn-group ml-3">
-                                <a className="btn btn-sm btn-white" href="/">
-                                    <i className="tio-delete"></i> Delete
-                                </a>
-                                </div>
-                            </td>
-                        
-                        </tr>
+                        {filtered !== null ? 
+                            filtered.map((x) => (
+                                <tr key={x.id}>
+                                <td className="table-column-pr-0">
+                                </td>
+                                <td>{x.fullname}</td>
+                                <td>{x.state}</td>
+                                <td>{x.email}</td>
+                                <td>{x.role}</td>
+                                <td>
+                                    <div className="btn-group">
+                                    <span className="btn btn-sm btn-white" onClick={() => setEdit(x)} data-toggle="modal" data-target="#addUserModal">
+                                        <i className="tio-edit"></i> Edit
+                                    </span>
+                                    </div>
+                                    <div className="btn-group ml-3">
+                                    <span className="btn btn-sm btn-white" onClick={() => onConfirm(x.id)}>
+                                        <i className="tio-delete"></i> Delete
+                                    </span>
+                                    </div>
+                                </td>
+                            
+                            </tr>
+                            ))
+                            :                       
+                            users.length > 0 ? 
+                            users.map((x) => (
+                                <tr key={x.id}>
+                                <td className="table-column-pr-0">
+                                </td>
+                                <td>{x.fullname}</td>
+                                <td>{x.state}</td>
+                                <td>{x.email}</td>
+                                <td>{x.role}</td>
+                                <td>
+                                    <div className="btn-group">
+                                    <span className="btn btn-sm btn-white" onClick={() => setEdit(x)}  data-toggle="modal" data-target="#addUserModal">
+                                        <i className="tio-edit"></i> Edit
+                                    </span>
+                                    </div>
+                                    <div className="btn-group ml-3">
+                                    <span className="btn btn-sm btn-white" onClick={() => onConfirm(x.id)}>
+                                        <i className="tio-delete"></i> Delete
+                                    </span>
+                                    </div>
+                                </td>
+                            
+                            </tr>
                         )): (
                             <tr>
                             <td colSpan="14" className="text-center">No user available</td>
@@ -189,7 +228,7 @@ const User = () => {
                 </div>
             
             </div>
-            <AddUserModal />
+            <AddUserModal user={user}/>
     </Fragment>
     )
 }

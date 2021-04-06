@@ -1,4 +1,13 @@
-const { create, getTransactionById, getTransactions, updateTransaction, deleteTransaction} = require("../services/transaction.service");
+const { 
+    create, 
+    getTransactionById, 
+    getTransactions, 
+    updateTransaction, 
+    searchByDate, 
+    searchUserTransactionByDate, 
+    searchTransaction,
+    deleteTransaction
+} = require("../services/transaction.service");
 
 
 exports.createTransaction = async (req, res) => {
@@ -26,7 +35,7 @@ exports.getTransactions = async (req, res) => {
         }
         return res.status(200).json({
             success: true,
-            data: results
+            data: results.sort((x, y) => y.id - x.id)
         })
     })
 }
@@ -61,6 +70,50 @@ exports.updateTransaction = async(req, res) => {
         return res.status(200).json({
             success: true,
             msg: "Updated Successfully"
+        })
+    })
+}
+
+exports.searchByDate = async(req, res) => {
+    const body = req.body;
+    searchByDate(body, (err, results) => {
+        if(err) {
+            console.log(err);
+            return;
+        }
+        return res.status(200).json({
+            success: true,
+            count: results.length,
+            data: results.sort((x, y) => y.id - x.id)
+        })
+    })
+}
+
+exports.searchUserTransactionByDate = async(req, res) => {
+    const body = req.body;
+    searchUserTransactionByDate(body, (err, results) => {
+        if(err) {
+            console.log(err);
+            return;
+        }
+        return res.status(200).json({
+            success: true,
+            count: results.length,
+            data: results.sort((x, y) => y.id - x.id)
+        })
+    })
+}
+
+exports.searchTransaction = async(req, res) => {
+    const body = req.body;
+    searchTransaction(body, (err, results) => {
+        if(err) {
+            console.log(err);
+            return;
+        }
+        return res.status(200).json({
+            success: true,
+            data: results[results.length - 1]
         })
     })
 }

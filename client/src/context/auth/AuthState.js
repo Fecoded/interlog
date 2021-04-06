@@ -8,7 +8,7 @@ import {
     USER_LOADED, 
     USERS_LOADED, 
     LOGIN_SUCCESS, 
-    // REGISTER_SUCCESS, 
+    FILTERED_USERS, 
     LOGIN_FAIL, 
     REGISTER_FAIL, 
     AUTH_ERROR,
@@ -23,6 +23,7 @@ const AuthState = props => {
         isAuthenticated: null,
         user: null,
         users: [],
+        filtered: null,
         error: null,
         loading: false,
     }
@@ -123,10 +124,57 @@ const AuthState = props => {
     }
   };
 
+    // Update User
+    const updateUser = async formData => {
+      const config = {
+        headers: {
+          'Content-type': 'application/json'
+        }
+      };
+  
+      try {
+        const res = await axios.patch('/user', formData, config);
+  
+        formData.setFullname("");
+        formData.setEmail("");
+        formData.hideModal(window.$("#addUserModal").modal("hide"));
+        toastr.success(res.data.message);
+  
+        loadUsers();
+      } catch (err) {
+        toastr.error(err.response.data.message);
+        dispatch({
+          type: REGISTER_FAIL,
+          payload: err.response.data.msg
+        });
+      }
+    };
+
+      // Remove User
+      const deleteUser = async (id) => {
+        if (localStorage.token) {
+          setAuthToken(localStorage.token);
+        };
+  
+        try {
+          const res = await axios.delete('/user', {params: {id}});
+  
+          toastr.success(res.data.message);
+          loadUsers();
+          
+        } catch (err) {
+          toastr.error(err.response.data.message);
+          dispatch({
+            type: REGISTER_FAIL,
+            payload: err.response.data.msg
+          });
+        }
+      }
+
+  const filteruser = (text) => dispatch({ type: FILTERED_USERS, payload: text });
+
   // Logout
-  const logout = () => {
-    dispatch({ type: LOGOUT })
-  }
+  const logout = () => dispatch({ type: LOGOUT });
 
 
     return (
@@ -135,6 +183,7 @@ const AuthState = props => {
                 token: state.token,
                 isAuthenticated: state.isAuthenticated,
                 loading: state.loading,
+                filtered: state.filtered,
                 user: state.user,
                 users: state.users,
                 error: state.error,
@@ -142,6 +191,9 @@ const AuthState = props => {
                 register,
                 loadUser,
                 loadUsers,
+                updateUser,
+                filteruser,
+                deleteUser,
                 logout
             }}
         >

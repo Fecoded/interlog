@@ -21,10 +21,13 @@ const EditTransactionModal = ({ current, user }) => {
     const [Opening_balance, setOpening_balance] = useState(0);
     const [Product_Name, setProduct_Name] = useState("");
     const [Release_, setRelease_] = useState(0);
-    const [Release_balance, setRelease_balance] = useState(Release_ - Loading);
+    let Release_balance = Release_ - Loading;
+    const [setRelease_balance] = useState(Release_balance);
     const [Take_on, setTake_on] = useState(0);
-    const [Closing_balance, setClosing_balance] = useState(Number.parseInt(Opening_balance) + Number.parseInt(Take_on) - Release_);
-    const [Physical_Stock_Balance, setPhysical_Stock_Balance] = useState(Number.parseInt(Opening_balance) + Number.parseInt(Take_on) - Loading);
+    let Closing_balance = Number.parseInt(Opening_balance) + Number.parseInt(Take_on) - Release_;
+    const [setClosing_balance] = useState(Closing_balance);
+    let Physical_Stock_Balance = Number.parseInt(Opening_balance) + Number.parseInt(Take_on) - Loading;
+    const [setPhysical_Stock_Balance] = useState(Physical_Stock_Balance);
 
  const hideModal = () => {};
 
@@ -34,15 +37,16 @@ const EditTransactionModal = ({ current, user }) => {
         setField_Staff_Name(current.Field_Staff_Name);
         setCustomer_Name(current.Customer_Name);
         setLoading(current.Loading);
+        setReporting_date(current.Reporting_Date);
         setOpening_balance(current.Opening_balance);
         setProduct_Name(current.Product_Name);
         setRelease_(current.Release_);
-        setRelease_balance(current.Release_balance);
+        // setRelease_balance(current.Release_balance);
         setTake_on(current.Take_on);
-        setClosing_balance(current.Closing_balance);
-        setPhysical_Stock_Balance(current.Physical_Stock_Balance);
+        // setClosing_balance(current.Closing_balance);
+        // setPhysical_Stock_Balance(current.Physical_Stock_Balance);
+        
     }
-
   //eslint-disable-next-line
  },[current])
 

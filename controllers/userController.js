@@ -88,6 +88,7 @@ exports.updateUser = async(req, res) => {
     const salt = await bcrypt.genSalt(10);
 
     body.password = await bcrypt.hash(body.password, salt);
+    
     updateUser(body, (err, results) => {
         if(err) {
             console.log(err);
@@ -101,13 +102,13 @@ exports.updateUser = async(req, res) => {
         }
         return res.status(200).json({
             success: true,
-            message: "Updated Successfully"
+            message: "Updated Successfull"
         })
     })
 }
 
 exports.deleteUser = async(req, res) => {
-    const data = req.body;
+    const data = req.query;
     deleteUser(data, (err, results) => {
         if(err) {
             console.log(err);
