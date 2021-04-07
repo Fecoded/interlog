@@ -1,5 +1,15 @@
 import {useReducer} from 'react';
-import {GET_TRANSACTIONS, USER_TRANSACTIONS, CREATE_TRANSACTION, UPDATE_TRANSACTION, SET_CURRENT, TRANSACTION_ERROR} from '../types';
+import {
+  GET_TRANSACTIONS, 
+  USER_TRANSACTIONS, 
+  CREATE_TRANSACTION, 
+  UPDATE_TRANSACTION, 
+  SET_CURRENT, 
+  SEARCH_TRANSACTION,
+  TRANSACTION,
+  FILTERED_TRANSACTION,
+  TRANSACTION_ERROR
+} from '../types';
 import axios from 'axios';
 import TransactionContext from './TransactionContext';
 import TransactionReducer from './TransactionReducer';
@@ -14,6 +24,8 @@ const TransactionState = props => {
         transactions: [],
         userTransactions: [],
         current: null,
+        filtered: null,
+        data: null,
         loading: false,
         error: null
     }
@@ -33,7 +45,6 @@ const TransactionState = props => {
         type: GET_TRANSACTIONS,
         payload: res.data.data
       });
-
       
     } catch (err) {
       dispatch({ type: TRANSACTION_ERROR, payload: err.response.message });
@@ -191,6 +202,82 @@ const TransactionState = props => {
     dispatch({ type: SET_CURRENT, payload: data });
   }
 
+  const searchByDate = async (search) => {
+    if (localStorage.token) {
+      setAuthToken(localStorage.token);
+    };
+
+    const config = {
+      headers : {
+        "Content-Type": "application/json"
+      }
+    };
+   
+    try {
+      const res = await axios.post('/transaction/search', search, config);
+    
+      dispatch({ type: SEARCH_TRANSACTION, payload: res.data.data })
+      search.setFrom("");
+      search.setTo("");
+      search.hideModal(window.$("#filterModal").modal("hide"));
+    } catch (err) {
+      console.log(err)
+      dispatch({ type: TRANSACTION_ERROR });
+    }
+    
+  }
+
+  const searchUserTransactionByDate = async (search) => {
+    if (localStorage.token) {
+      setAuthToken(localStorage.token);
+    };
+
+    const config = {
+      headers : {
+        "Content-Type": "application/json"
+      }
+    };
+   
+    try {
+      const res = await axios.post('/transaction/search-user-transaction', search, config);
+    
+      dispatch({ type: SEARCH_TRANSACTION, payload: res.data.data })
+      search.setFrom("");
+      search.setTo("");
+      search.hideModal(window.$("#filterModal").modal("hide"));
+    } catch (err) {
+      console.log(err)
+      dispatch({ type: TRANSACTION_ERROR });
+    }
+    
+  }
+
+  const searchTransaction = async (search) => {
+    if (localStorage.token) {
+      setAuthToken(localStorage.token);
+    };
+
+    const config = {
+      headers : {
+        "Content-Type": "application/json"
+      }
+    };
+   
+    try {
+      const res = await axios.post('/transaction/search-transaction', search, config);
+    
+      dispatch({ type: TRANSACTION, payload: res.data.data })
+     
+    } catch (err) {
+      console.log(err)
+      dispatch({ type: TRANSACTION_ERROR });
+    }
+    
+  }
+
+
+  const filtertransaction = (text) => dispatch({ type: FILTERED_TRANSACTION, payload: text });
+
 
     return (
         <TransactionContext.Provider
@@ -198,7 +285,9 @@ const TransactionState = props => {
                 transaction: state.transaction,
                 transactions: state.transactions,
                 userTransactions: state.userTransactions,
+                filtered: state.filtered,
                 current: state.current,
+                data: state.data,
                 error: state.error,
                 getTransactions,
                 createTransaction,
@@ -206,6 +295,10 @@ const TransactionState = props => {
                 updateApproval,
                 deleteTransaction,
                 getUserTransactions,
+                filtertransaction,
+                searchByDate,
+                searchUserTransactionByDate,
+                searchTransaction,
                 setCurrent
             }}
         >

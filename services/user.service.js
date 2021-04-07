@@ -61,6 +61,7 @@ module.exports = {
             `UPDATE users SET fullname = ?, state = ?, email = ?, password = ?, role = ? WHERE id = ?`,
             [
                 data.fullname,
+                data.state,
                 data.email,
                 data.password,
                 data.role,
@@ -75,6 +76,7 @@ module.exports = {
         )
     },
     deleteUser: (data, cb) => {
+        console.log(data);
         pool.query(
             `DELETE from users where id = ?`,
             [data.id],

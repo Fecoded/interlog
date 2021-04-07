@@ -55,7 +55,7 @@ module.exports = {
     updateTransaction: (data, cb) => {
         console.log(data);
         pool.query(
-            `UPDATE transactions SET UserId = ?, Customer_Name = ?,Product_Name = ?,Reporting_Date = ?,Field_Staff_Name = ?,State = ?,Opening_balance = ?,Take_on = ?,Release_ = ?,Loading = ?,Release_balance = ?,Closing_balance = ?,Physical_Stock_Balance = ?, Approval_1 = ?, Approval_2 = ?  WHERE id = ?`,
+            `UPDATE transactions SET UserId = ?, Customer_Name = ?,Product_Name = ?,Reporting_Date = ?,Field_Staff_Name = ?,State = ?,Opening_balance = ?,Take_on = ?,Release_ = ?,Loading = ?,Release_balance = ?,Closing_balance = ?,Physical_Stock_Balance = ?, Approval_1 = ?, Approval_2 = ?, Approval_3 = ?  WHERE id = ?`,
             [
                 data.UserId,
                 data.Customer_Name,
@@ -72,16 +72,57 @@ module.exports = {
                 data.Physical_Stock_Balance,
                 data.Approval_1,
                 data.Approval_2,
+                data.Approval_3,
                 data.id
             ],
             (error, results, fields) => {
                 if(error) {
                     cb(error);
                 }
-                return cb(null, results)
+                return cb(null, results);
             }
         )
     },
+
+    searchByDate: (data, cb) => {
+        pool.query(
+            `SELECT * FROM transactions WHERE Reporting_Date BETWEEN ? AND ?`,
+            [data.From, data.To],
+            (error, results, fields) => {
+                if(error) {
+                    cb(error);
+                }
+                return  cb(null, results);
+            }
+        )
+    },
+
+    searchUserTransactionByDate: (data, cb) => {
+        pool.query(
+            `SELECT * FROM transactions WHERE UserId = ? AND Reporting_Date BETWEEN ? AND ?`,
+            [data.UserId, data.From, data.To],
+            (error, results, fields) => {
+                if(error) {
+                    cb(error);
+                }
+                return  cb(null, results);
+            }
+        )
+    },
+
+    searchTransaction: (data, cb) => {
+        pool.query(
+            `SELECT * FROM transactions WHERE Customer_Name = ? AND Product_Name = ?`,
+            [data.Customer_Name, data.Product_Name],
+            (error, results, fields) => {
+                if(error) {
+                    cb(error);
+                }
+                return  cb(null, results);
+            }
+        )
+    },
+
     deleteTransaction: (data, cb) => {
         pool.query(
             `DELETE from transactions where id = ?`,

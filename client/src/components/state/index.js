@@ -41,5 +41,6 @@ export const Roles = [
         "admin",
         "manager",
         "hr",
-        "staff"
+        "staff",
+        "supervisor"
 ]

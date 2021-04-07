@@ -15,7 +15,7 @@ const AddTransaction = () => {
   const customerContext = useContext(CustomerContext);
   const productContext = useContext(ProductContext);
 
-  const { createTransaction } = transactionContext;
+  const { createTransaction, searchTransaction, data } = transactionContext;
   const { getCustomers, customers } = customerContext;
   const { getProducts, products } = productContext;
   const { loadUser, user} = authContext;
@@ -28,21 +28,24 @@ const AddTransaction = () => {
   const [Product_Name, setProduct_Name] = useState("");
   const [Release_, setRelease_] = useState(0);
   let Release_balance = Release_ - Loading;
-  const [setRelease_balance] = useState(Release_balance);
+  const [setRelease_balance] = useState(data && data.Release_balance);
   const [Take_on, setTake_on] = useState(0);
   let Closing_balance = Number.parseInt(Opening_balance) + Number.parseInt(Take_on) - Release_;
   const [setClosing_balance] = useState(Closing_balance);
   let Physical_Stock_Balance = Number.parseInt(Opening_balance) + Number.parseInt(Take_on) - Loading;
-  const [setPhysical_Stock_Balance] = useState(Physical_Stock_Balance);
+  const [setPhysical_Stock_Balance] = useState(data && data.Physical_Stock_Balance);
 
 
   useEffect(() => {
       loadUser();
       getCustomers();
       getProducts();
+      if(Customer_Name !== "" && Product_Name !== "") 
+        searchTransaction({ Customer_Name, Product_Name });
 
+   
     //eslint-disable-next-line
-  },[])
+  },[Customer_Name, Product_Name])
 
   const onSubmit = (e) => {
       e.preventDefault();
