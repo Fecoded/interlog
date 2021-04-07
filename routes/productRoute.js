@@ -4,9 +4,9 @@ const { createProduct, getProductById, getProducts, updateProduct, deleteProduct
 const { auth, authorize } = require("../middleware/auth")
 
 router.route("/").get(auth, getProducts)
-                 .post(auth, authorize("admin", "manager", "hr"), createProduct)
-                 .patch(auth, authorize("admin", "manager", "hr"), updateProduct)
-                 .delete(auth, authorize("admin", "manager", "hr"), deleteProduct);
+                 .post(auth, authorize("admin", "staff"), createProduct)
+                 .patch(auth, authorize("admin", "staff"), updateProduct)
+                 .delete(auth, authorize("admin", "staff"), deleteProduct);
 router.route("/:id").get(auth, getProductById);
 
 module.exports = router;

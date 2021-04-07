@@ -208,7 +208,7 @@ const Transaction = () => {
               {role === "admin" || role === "manager" || role === "hr" ?
                 <tbody>
                   {transactions.length > 0 ? 
-                    transactions.map((x) => (
+                    transactions.sort((a, b) => a - b).map((x) => (
                       <tr key={x.id}>
                       <td className="table-column-pr-0">
                       </td>
