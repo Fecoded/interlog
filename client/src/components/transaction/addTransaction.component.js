@@ -28,24 +28,32 @@ const AddTransaction = () => {
   const [Product_Name, setProduct_Name] = useState("");
   const [Release_, setRelease_] = useState(0);
   let Release_balance = Release_ - Loading;
-  const [setRelease_balance] = useState(data && data.Release_balance);
+//   Release_balance = _Release_balance - Loading;
+  const [setRelease_balance] = useState(Release_balance);
   const [Take_on, setTake_on] = useState(0);
   let Closing_balance = Number.parseInt(Opening_balance) + Number.parseInt(Take_on) - Release_;
   const [setClosing_balance] = useState(Closing_balance);
   let Physical_Stock_Balance = Number.parseInt(Opening_balance) + Number.parseInt(Take_on) - Loading;
-  const [setPhysical_Stock_Balance] = useState(data && data.Physical_Stock_Balance);
+  const [setPhysical_Stock_Balance] = useState(Physical_Stock_Balance);
 
+  let role = user && user.data.role;
 
   useEffect(() => {
       loadUser();
       getCustomers();
       getProducts();
-      if(Customer_Name !== "" && Product_Name !== "") 
-        searchTransaction({ Customer_Name, Product_Name });
-
-   
+        if(data) {
+            setOpening_balance(data.Closing_balance);
+            setRelease_(data.Release_balance);
+            // setLoading(data.Loading);
+        }
     //eslint-disable-next-line
-  },[Customer_Name, Product_Name])
+  },[data])
+
+  const onBlur = () => {
+    if(Customer_Name !== "" && Product_Name !== "") 
+        searchTransaction({ Customer_Name, Product_Name });
+  }
 
   const onSubmit = (e) => {
       e.preventDefault();
@@ -89,10 +97,12 @@ const AddTransaction = () => {
                             </nav>
                             <h1 className="page-header-title">Add Transaction</h1>
                         </div>
-                        <div className="col-sm-auto">
-                            <span className="btn btn-primary" data-toggle="modal" data-target="#addCustomersModal">Add Customer</span>
-                            <span className="btn btn-primary ml-3" data-toggle="modal" data-target="#addProductsModal">Add Product</span>
-                        </div>
+                        {role !== "staff" &&
+                            <div className="col-sm-auto">
+                                <span className="btn btn-primary" data-toggle="modal" data-target="#addCustomersModal">Add Customer</span>
+                                <span className="btn btn-primary ml-3" data-toggle="modal" data-target="#addProductsModal">Add Product</span>
+                            </div>
+                        }
                        
                     </div>
                 </div>
@@ -129,6 +139,7 @@ const AddTransaction = () => {
                                                   className="js-select2-custom custom-select" 
                                                   name="Product_Name"
                                                   required
+                                                  onBlur={onBlur}
                                             >
                                                 <option label="Select Product"></option>
                                                 {products.map(x => (

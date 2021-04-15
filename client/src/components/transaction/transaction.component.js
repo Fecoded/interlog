@@ -232,13 +232,8 @@ const Transaction = () => {
               </thead>
              
                 <tbody>
-<<<<<<< HEAD
-                  {transactions.length > 0 ? 
-                    transactions.sort((a, b) => a - b).map((x) => (
-=======
                   {filtered !== null ? (
                       filtered.map((x) => 
->>>>>>> 3c2cf4e88216fd77d7b3edec877b897f3ec8cf4b
                       <tr key={x.id}>
                       <td className="table-column-pr-0">
                       </td>

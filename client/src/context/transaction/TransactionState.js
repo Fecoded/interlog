@@ -266,7 +266,7 @@ const TransactionState = props => {
     try {
       const res = await axios.post('/transaction/search-transaction', search, config);
     
-      dispatch({ type: TRANSACTION, payload: res.data.data })
+      dispatch({ type: TRANSACTION, payload: res.data.data });
      
     } catch (err) {
       console.log(err)
